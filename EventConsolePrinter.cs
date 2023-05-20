@@ -13,10 +13,22 @@ public static class EventConsolePrinter
         }
     }
 
-    public static void PrintHoursSpentForWorkingActivities(List<Event> relevantEvents)
+    public static void PrintHoursSpentForOnlyWorkingActivtyTypes(List<Event> relevantEvents)
     {
-        var workingColorIdInfo = ColorIdProvider.GetOnlyWorkingColorIds();
+        var colorIdInfoList = ColorIdProvider.GetOnlyWorkingColorIds();
 
+        PrintHoursSpentForEachTypeOfActivity(relevantEvents, colorIdInfoList);
+    }
+
+    public static void PrintHoursSpentForOnlyNonWorkingActivtyTypes(List<Event> relevantEvents)
+    {
+        var colorIdInfoList = ColorIdProvider.GetOnlyNonWorkingColorIds();
+
+        PrintHoursSpentForEachTypeOfActivity(relevantEvents, colorIdInfoList);
+    }
+
+    private static void PrintHoursSpentForEachTypeOfActivity(List<Event> relevantEvents, List<ColorIdProvider.ColorIdInfo> workingColorIdInfo)
+    {
         foreach (var info in workingColorIdInfo)
         {
             var particularActivity = relevantEvents.Where(e => e.ColorId == info.Number).ToList();

@@ -29,6 +29,13 @@
             .ToList();
     }
 
+    public static List<ColorIdInfo> GetOnlyNonWorkingColorIds()
+    {
+        return GetAllRelevantColorIdInfo()
+            .Where(info => info.Number == ColorIds.Misc.ToNumber() || info.Number == ColorIds.Wasted.ToNumber())
+            .ToList();
+    }
+
     public static ColorIdInfo GetDefaultCalendarColorIdInfo()
     {
         return new(ColorIds.Meta.ToNumber(), ColorIds.Meta.ToName());
