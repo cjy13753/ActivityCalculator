@@ -6,3 +6,6 @@ This is a customized activity time calculator based on my Google Calendar.
 2. You need `appsettings.json` file **in the root directory** where you store the following data:
 	1. `CalendarId`: the id of the specific calendar that you want to get events from.
 	2. `CredentialPath`: it's the path of the `credentials.json` file.
+
+## Todo
+- [ ] Make it a simple web app so I can use it on any devices where I can log in to my Google account.
