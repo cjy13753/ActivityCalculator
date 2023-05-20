@@ -9,3 +9,4 @@ This is a customized activity time calculator based on my Google Calendar.
 
 ## Todo
 - [ ] Make it a simple web app so I can use it on any devices where I can log in to my Google account.
+- [ ] Detect if there are at least two concurrent events. If so, fail the operation.
