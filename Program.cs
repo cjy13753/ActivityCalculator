@@ -3,9 +3,9 @@
     static void Main(string[] args)
     {
         //var targetDate = new DateTime(2023, 5, 20);
-        var targetDate = DateTime.Today.AddDays(-1);   
-        
-        var relevantEvents = EventsFetcher.FetchRelevant(targetDate);
+        var targetDate = DateTime.Today.AddDays(-1);
+
+        var relevantEvents = new EventsFetcher().FetchRelevant(targetDate); ;
         
         EventConsolePrinter.PrintHoursSpentForOnlyWorkingActivtyTypes(relevantEvents);
         Console.WriteLine("==========");

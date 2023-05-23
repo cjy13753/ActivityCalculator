@@ -4,22 +4,46 @@ using Google.Apis.Calendar.v3.Data;
 using Google.Apis.Services;
 using Microsoft.Extensions.Configuration;
 
+public class EventsValidator
+{
+    public void CheckIfNoOverlappingEvents(IList<Event> eventItems)
+    {
+        for (int i = 1; i < eventItems.Count; i++)
+        {
+            var prevEventEndTime = eventItems[i - 1].End.DateTime;
+            var currentEventStartTime = eventItems[i].Start.DateTime;
+            if (prevEventEndTime <= currentEventStartTime)
+            {
+                continue;
+            }
+            throw new Exception("Check your events. No overlapping events can exist.");
+        }
+    }
+}
+
 public class EventsFetcher
 {
-    public static List<Event> FetchRelevant(DateTime targetDate)
+    private readonly EventsValidator _eventsValidator;
+
+    public EventsFetcher()
+    {
+        _eventsValidator = new EventsValidator();
+    }
+
+    public List<Event> FetchRelevant(DateTime targetDate)
     {
         var events = FetchAll(targetDate);
         return FilterRelevantEvents(events);
     }
 
-    private static IList<Event> FetchAll(DateTime targetDate)
+    private IList<Event> FetchAll(DateTime targetDate)
     {
         var configuration = GetConfiguration();
         var service = GetCalendarService(configuration);
         return GetEvents(configuration, service, targetDate);
     }
 
-    private static List<Event> FilterRelevantEvents(IList<Event> events)
+    private List<Event> FilterRelevantEvents(IList<Event> events)
     {
         var validColorIds = ColorIdProvider.GetAllRelevantColorIdInfo().Select(info => info.Number).ToList();
         var filter = 0;
@@ -62,7 +86,7 @@ public class EventsFetcher
         return consecutiveEvents;
     }
 
-    private static IList<Event> GetEvents(IConfigurationRoot configuration, CalendarService service, DateTime targetDate)
+    private IList<Event> GetEvents(IConfigurationRoot configuration, CalendarService service, DateTime targetDate)
     {
         var timeMin = targetDate;
         var timeMax = targetDate.AddDays(1);
@@ -74,20 +98,22 @@ public class EventsFetcher
         request.SingleEvents = true;
         request.OrderBy = EventsResource.ListRequest.OrderByEnum.StartTime;
         Events events = request.Execute();
+        var eventsItems = events.Items;
 
-        FillNullColorIdsOfEventsWithDefaultColor(events);
+        _eventsValidator.CheckIfNoOverlappingEvents(eventsItems);
+        FillNullColorIdsOfEventsWithDefaultColor(eventsItems);
 
         return events.Items;
     }
-    private static void FillNullColorIdsOfEventsWithDefaultColor(Events events)
+    private void FillNullColorIdsOfEventsWithDefaultColor(IList<Event> eventsItems)
     {
-        foreach (var item in events.Items)
+        foreach (var item in eventsItems)
         {
             item.ColorId ??= ColorIdProvider.GetDefaultCalendarColorIdInfo().Number;
         }
     }
 
-    private static CalendarService GetCalendarService(IConfigurationRoot configuration)
+    private CalendarService GetCalendarService(IConfigurationRoot configuration)
     {
         UserCredential credential;
         using (var stream = new FileStream(configuration["CredentialPath"], FileMode.Open, FileAccess.Read))
@@ -106,7 +132,7 @@ public class EventsFetcher
         return service;
     }
 
-    private static IConfigurationRoot GetConfiguration()
+    private IConfigurationRoot GetConfiguration()
     {
         var builder = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
