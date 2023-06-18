@@ -89,7 +89,7 @@ public class EventsFetcher
     private IList<Event> GetEvents(IConfigurationRoot configuration, CalendarService service, DateTime targetDate)
     {
         var timeMin = targetDate;
-        var timeMax = targetDate.AddDays(1);
+        var timeMax = targetDate.AddDays(2);
 
         EventsResource.ListRequest request = service.Events.List(configuration["CalendarId"]);
         request.TimeMin = timeMin;
